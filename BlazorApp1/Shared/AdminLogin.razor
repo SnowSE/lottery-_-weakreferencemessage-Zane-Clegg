@@ -1,0 +1,22 @@
+﻿@inject IConfiguration config
+
+
+<form method="dialog">
+
+    <label>Password</label>
+    <input type="password" @bind=adminpassword />
+    <button @onclick="TestAdminPassword">Login as Admin</button>
+</form>
+
+
+@code {
+    private string adminpassword;
+    [Parameter] public EventCallback AuthenticationSucceeded { get; set; }
+    private async Task TestAdminPassword()
+    {
+        if( config["AdminAccess"] == adminpassword)
+        {
+           await AuthenticationSucceeded.InvokeAsync();
+        }
+    }
+}

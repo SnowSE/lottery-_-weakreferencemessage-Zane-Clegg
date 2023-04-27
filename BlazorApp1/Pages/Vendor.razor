@@ -1,0 +1,41 @@
+﻿@page "/Vendor"
+@page "/"
+@inject LotteryProgram lp
+<h1>Vendor Lottery Ticket Sales Control</h1>
+<label>Vendor Name</label>
+<input @bind="vendorname" />
+
+@if (lp.p.SalesState == TicketSales.OK && !String.IsNullOrWhiteSpace(vendorname))
+{
+    <VendorPurchasingControls VendorName=@vendorname/>
+    
+}
+@if (shouldShowVendorResults)
+{
+    <VendorResults VendorName="@vendorname"/>
+}
+@code {
+    private string vendorname = "";
+    private bool shouldShowVendorResults = false;
+
+    override protected void OnInitialized()
+    {
+        // original freebie - check out the AdminPage.razor hint :)
+        //TODO - Register to know if Program State has Changed
+
+        //Slightly different approach
+        //TODO (done for you) - Register to know if Vendor Results Available State has changed
+
+        WeakReferenceMessenger.Default.Register<VendorResultsAvailable>(this, (_, _) =>
+        InvokeAsync(() =>
+        {
+            shouldShowVendorResults = true;
+            StateHasChanged();
+        }
+        ));
+
+        //hint - use that slightly different approach
+        //TODO - Register to know if Vendor Results NOT Available state has changed
+
+    }
+}
