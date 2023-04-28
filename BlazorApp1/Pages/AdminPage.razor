@@ -41,6 +41,8 @@ else
         {
             throw new Exception("Enable Error: Period was still open.");
         }
+        WeakReferenceMessenger.Default.Send(new VendorResultsNotAvailable());
+
     }
     private async Task DisableTicketSales()
     {
