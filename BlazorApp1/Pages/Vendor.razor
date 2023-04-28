@@ -26,7 +26,6 @@
 
         //Slightly different approach
         //TODO (done for you) - Register to know if Vendor Results Available State has changed
-
         WeakReferenceMessenger.Default.Register<VendorResultsAvailable>(this, (_, _) =>
         InvokeAsync(() =>
         {
@@ -37,6 +36,13 @@
 
         //hint - use that slightly different approach
         //TODO - Register to know if Vendor Results NOT Available state has changed
+        WeakReferenceMessenger.Default.Register<VendorResultsNotAvailable>(this, (_, _) =>
+       InvokeAsync(() =>
+       {
+           shouldShowVendorResults = false;
+           StateHasChanged();
+       }
+       ));
 
     }
 }

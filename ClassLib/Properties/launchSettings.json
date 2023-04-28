@@ -1,0 +1,7 @@
+{
+  "profiles": {
+    "ClassLib": {
+      "commandName": "Project"
+    }
+  }
+}

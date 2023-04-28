@@ -68,8 +68,9 @@ else
         GrandTotalPrizes += PrizesPaidAmt;
         log.Add("Whew!");
         isClosingPeriod = false;
-        
+
         //TODO - how will I tell the client (Vendors) the message that Vendor Results are available?
+        WeakReferenceMessenger.Default.Send(new VendorResultsAvailable());
 
     }
 

@@ -52,6 +52,8 @@ Out of @((lp.p.winningTicketsL.Count+lp.p.losingTicketsL.Count).ToString("N0")) 
     override protected void OnInitialized()
     {
         //TODO - How will I register to know that Vendor Results are Available?
+        WeakReferenceMessenger.Default.Register<VendorResultsAvailable>(this, (_, _) => InvokeAsync(StateHasChanged));
+
         winningTickets = from t in lp.p.winningTicketsL
                          where t.winLevel == 1 ||
                          t.winLevel == 2 ||
