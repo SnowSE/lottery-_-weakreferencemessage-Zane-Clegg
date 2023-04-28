@@ -22,6 +22,7 @@
     {
         // original freebie - check out the AdminPage.razor hint :)
         //TODO - Register to know if Program State has Changed
+        WeakReferenceMessenger.Default.Register<ProgramStateChanged>(this, (_, _) => InvokeAsync(StateHasChanged));
 
         //Slightly different approach
         //TODO (done for you) - Register to know if Vendor Results Available State has changed

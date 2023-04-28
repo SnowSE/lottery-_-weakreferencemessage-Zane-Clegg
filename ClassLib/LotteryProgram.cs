@@ -37,6 +37,8 @@ namespace ClassLib
                 lv=new LotteryVendor(p);
 
                 //TODO - how will you tell the vendor/clients that VendorResults are not availble?
+                WeakReferenceMessenger.Default.Send(new VendorResultsNotAvailable());
+
 
                 p.SalesState = TicketSales.OK;
                 return true;

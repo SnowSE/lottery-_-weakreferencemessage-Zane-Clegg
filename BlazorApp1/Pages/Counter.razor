@@ -1,18 +1,67 @@
 ﻿@page "/counter"
-
+@using ClassLib;
 <PageTitle>Counter</PageTitle>
 
 <h1>Counter</h1>
+<!--@for(int i = 0; i < 10; i++){}-->
+    <p role="status">Current count: 
+        @currentCount</p>
 
-<p role="status">Current count: @currentCount</p>
+<button class="btn btn-primary" @onclick="IncrementCount">@buttonText</button>
+<button class="btn btn-primary" @onclick="Automate" disabled="@codeKnowledge">"Automate"</button>
+<button class="btn btn-primary" @onclick="Email" disabled="@legalKnowledge">"Email"</button>
 
-<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
 
+@inject IJSRuntime JsRuntime
 @code {
     private int currentCount = 0;
+    private int sellAmount = 1;
+    private bool codeKnowledge = true;
+    private bool legalKnowledge = true;
+    private bool badEnd = true;
+
+    private string buttonText = "Sell 1";
 
     private void IncrementCount()
     {
-        currentCount++;
+        currentCount+= sellAmount;
+        if((Math.Log10(currentCount)%1) == 0){
+            buttonText = "Sell " + (currentCount);
+            sellAmount = currentCount;
+        }
+        if (currentCount >= 1000)
+        {
+            codeKnowledge = false;
+        }
+        if(currentCount >= 10000)
+        {
+            legalKnowledge = false;
+        }
+        if(currentCount >= 100000000)
+        {
+            buttonText = "Promotion";
+            Promote();
+        }
+    }
+    private async void Automate() 
+    {
+        if (badEnd == true)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "You wrote code on company time, the company took your code as per contract and put you out of a job");
+        }
+        else
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "You automated with permission and sold the code for a handy profit");
+        }
+    }
+    private async void Email() 
+    {
+        legalKnowledge = false;
+        badEnd = false;
+        await JsRuntime.InvokeVoidAsync("alert", "Your boss says it's fine to work on personal coding projects while mindlessly clicking"); 
+    }
+    private async void Promote()
+    {
+        await JsRuntime.InvokeVoidAsync("alert", "You sold tickets instead of bothering with code and worked your way up to CEO of capitalism");
     }
 }

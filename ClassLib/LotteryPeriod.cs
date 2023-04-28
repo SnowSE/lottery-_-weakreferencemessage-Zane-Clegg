@@ -25,6 +25,10 @@ namespace ClassLib
 
     public class LotteryPeriod
     {
+        public LotteryPeriod()
+        {
+            
+        }
         int[] winTicket = { 1, 2, 3, 4, 5, 6 }; //Winning Ticket Values
         public ConcurrentStack<LotteryTicket> soldTickets = new ConcurrentStack<LotteryTicket>();
         public List<LotteryTicket> winningTicketsL = new List<LotteryTicket>();
@@ -48,9 +52,11 @@ namespace ClassLib
                 try
                 {
                     System.Threading.Interlocked.Exchange(ref _salesState, (int)value);
-                    //TODO - How will you send a message to the client/Vendors telling them the state has changed?
-                    if ((TicketSales)_salesState !=TicketSales.OK)
-                        //TODO - How will you send a message to the client/Vendors telling them that Vendor Results are not available?
+
+                    WeakReferenceMessenger.Default.Send(new ProgramStateChanged()); //TODO - How will you send a message to the client/Vendors telling them the state has changed?
+
+                    if ((TicketSales)_salesState != TicketSales.OK) ;
+                    WeakReferenceMessenger.Default.Send(new VendorResultsNotAvailable());//TODO - How will you send a message to the client/Vendors telling them that Vendor Results are not available?
                 }
                 finally
                 {
@@ -94,39 +100,43 @@ namespace ClassLib
         public void ComputeWinners()
         {
             //TODO: ensure the state is set to ONLY let this work if drawing has started/ended
-            LotteryTicket lt;
-            if (SalesState == TicketSales.CLOSED)
+             WeakReferenceMessenger.Default.Register<ProgramStateChanged>(this, (_, _) =>
             {
-                while (!soldTickets.IsEmpty)
+                LotteryTicket lt;
+                if (SalesState == TicketSales.CLOSED)
                 {
-                    try
+                    while (!soldTickets.IsEmpty)
                     {
-                        if (soldTickets.TryPop(out lt))
+                        try
                         {
-                            CheckWinningTicket(lt);
-                            if (lt.winLevel > 0)
+                            if (soldTickets.TryPop(out lt))
                             {
-                                winningTicketsL.Add(lt);
+                                CheckWinningTicket(lt);
+                                if (lt.winLevel > 0)
+                                {
+                                    winningTicketsL.Add(lt);
+                                }
+                                else
+                                {
+                                    losingTicketsL.Add(lt);
+                                }
                             }
-                            else
-                            {
-                                losingTicketsL.Add(lt);
-                            }
+                            //each ticket is moved from soldTickets to ( winningTickets or losingTickets )
                         }
-                        //each ticket is moved from soldTickets to ( winningTickets or loosingTickets )
+                        catch (System.InvalidOperationException)
+                        {
+                            //"All sold tickets have been 'computed'"
+                            break;
+                        }//leave the while 
                     }
-                    catch (System.InvalidOperationException)
-                    {
-                        //"All sold tickets have been 'computed'"
-                        break;
-                    }//leave the while 
-                }
 
-            }
-            else
-            {
-                throw new ApplicationException("Period must be closed before winners can be computed");
-            }
+                }
+                else
+                {
+                    throw new ApplicationException("Period must be closed before winners can be computed");
+                }
+            });
+            
         }
 
         public int NumberMatchingWhiteBalls(LotteryTicket lt)

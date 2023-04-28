@@ -68,7 +68,10 @@ namespace ClassLib
 
             if (p.SalesState == TicketSales.OK)
             {
-                p.soldTickets.Push(lt);
+                lock (p.soldTickets)
+                {
+                    p.soldTickets.Push(lt);
+                }
             }
             else
                 throw new TicketSalesClosedException();
