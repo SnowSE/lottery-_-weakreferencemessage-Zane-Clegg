@@ -1,9 +1,9 @@
 ﻿@inject LotteryProgram lp
 @inject IJSRuntime JsRuntime
 
-<button class="btn btn-primary" @onclick="IncrementCount">@buttonText</button>
-<button class="btn btn-primary" @onclick="Automate" disabled="@codeKnowledge">"Automate"</button>
-<button class="btn btn-primary" @onclick="Email" disabled="@legalKnowledge">"Email"</button>
+<button class="btn btn-primary" @onclick="IncrementCount" disabled="@automated">@buttonText</button>
+<button class="btn btn-primary" @onclick="Automate" disabled="@codeKnowledge" hidden="@automated">"Automate"</button>
+<button class="btn btn-primary" @onclick="Email" disabled="@legalKnowledge" hidden="@automated">"Email"</button>
 <p>So far you have sold @lp.p.soldTickets.Count(t=>t.Player==VendorName).ToString("N0") tickets for this lottery period.</p>
 
 @code {
@@ -13,6 +13,7 @@
     private bool codeKnowledge = true;
     private bool legalKnowledge = true;
     private bool badEnd = true;
+    private bool automated = false;
 
     private string buttonText = "Sell 1";
 
@@ -20,20 +21,20 @@
     {
         BuyNTickets(sellAmount);
         currentCount += sellAmount;
-        if ((Math.Log10(currentCount) % 1) == 0)
+        if (currentCount %20 == 0)
         {
             buttonText = "Sell " + (currentCount);
-            sellAmount = currentCount;
+            sellAmount *=2;
         }
-        if (currentCount >= 1000)
+        if (currentCount >= 100)
         {
             codeKnowledge = false;
         }
-        if (currentCount >= 10000)
+        if (currentCount >= 1000)
         {
             legalKnowledge = false;
         }
-        if (currentCount >= 100000000)
+        if (currentCount >= 10000)
         {
             buttonText = "Promotion";
             Promote();
@@ -41,6 +42,7 @@
     }
     private async void Automate()
     {
+        automated = true;
         if (badEnd == true)
         {
             await JsRuntime.InvokeVoidAsync("alert", "You wrote code on company time, the company took your code as per contract and put you out of a job");
@@ -58,6 +60,7 @@
     }
     private async void Promote()
     {
+        automated = true;
         await JsRuntime.InvokeVoidAsync("alert", "You sold tickets instead of bothering with code and worked your way up to CEO of capitalism");
     }
     private void BuyNTickets(int numToBuy)
