@@ -99,45 +99,43 @@ namespace ClassLib
         }
         public void ComputeWinners()
         {
-            //TODO: ensure the state is set to ONLY let this work if drawing has started/ended
-             WeakReferenceMessenger.Default.Register<ProgramStateChanged>(this, (_, _) =>
-            {
-                LotteryTicket lt;
-                if (SalesState == TicketSales.CLOSED)
-                {
-                    while (!soldTickets.IsEmpty)
-                    {
-                        try
-                        {
-                            if (soldTickets.TryPop(out lt))
-                            {
-                                CheckWinningTicket(lt);
-                                if (lt.winLevel > 0)
-                                {
-                                    winningTicketsL.Add(lt);
-                                }
-                                else
-                                {
-                                    losingTicketsL.Add(lt);
-                                }
-                            }
-                            //each ticket is moved from soldTickets to ( winningTickets or losingTickets )
-                        }
-                        catch (System.InvalidOperationException)
-                        {
-                            //"All sold tickets have been 'computed'"
-                            break;
-                        }//leave the while 
-                    }
+            //TODO: ensure the state is set to ONLY let this work if drawing has started/ended DONE
 
-                }
-                else
+            LotteryTicket lt;
+            if (SalesState == TicketSales.CLOSED)
+            {
+                while (!soldTickets.IsEmpty)
                 {
-                    throw new ApplicationException("Period must be closed before winners can be computed");
+                    try
+                    {
+                        if (soldTickets.TryPop(out lt))
+                        {
+                            CheckWinningTicket(lt);
+                            if (lt.winLevel > 0)
+                            {
+                                winningTicketsL.Add(lt);
+                            }
+                            else
+                            {
+                                losingTicketsL.Add(lt);
+                            }
+                        }
+                        //each ticket is moved from soldTickets to ( winningTickets or loosingTickets )
+                    }
+                    catch (System.InvalidOperationException)
+                    {
+                        //"All sold tickets have been 'computed'"
+                        break;
+                    }//leave the while 
                 }
-            });
-            
+
+            }
+            else
+            {
+                throw new ApplicationException("Period must be closed before winners can be computed");
+            }
         }
+
 
         public int NumberMatchingWhiteBalls(LotteryTicket lt)
         {
